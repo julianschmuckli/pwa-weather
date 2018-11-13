@@ -5,7 +5,6 @@ var offline_files = [
     "index.html",
     "manifest.json",
     "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js",
-    "https://code.jquery.com/jquery-3.3.1.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css",
     "https://fonts.googleapis.com/icon?family=Material+Icons",
     "assets/style.css",

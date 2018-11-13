@@ -1,5 +1,6 @@
 function getData(city, callback) {
     if (navigator.onLine) {
+        M.toast({html: 'Fetching new data'});
         fetch("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=046556c9237983f3f147f37576993505&units=metric", {
             method: "GET"
         }).then(function (data) {

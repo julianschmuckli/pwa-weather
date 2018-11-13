@@ -28,8 +28,27 @@ function init() {
         getData("Baden,Switzerland", showTemperature);
     } else {
         showTemperature();
+        M.toast({html: 'You are offline. Loading old data.'});
         navigator.serviceWorker.ready.then(function (swRegistration) {
             return swRegistration.sync.register('getWeatherData');
         });
+    }
+}
+
+window.addEventListener("online", changeNetworkListener);
+window.addEventListener("offline", changeNetworkListener);
+
+var current_notification_network_listener;
+
+function changeNetworkListener() {
+    try {
+        current_notification_network_listener.dismiss();
+    } catch (e) {
+    }
+
+    if (!navigator.onLine) {
+        current_notification_network_listener = M.toast({html: 'You are offline now.'});
+    } else {
+        current_notification_network_listener = M.toast({html: 'Welcome back online.'});
     }
 }
