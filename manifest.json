@@ -1,0 +1,15 @@
+{
+  "short_name": "Weather",
+  "name": "PWA-Weather",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "index.html?utm_source=homescreen",
+  "background_color": "#e05a47",
+  "theme_color": "#e05a47",
+  "display": "standalone"
+}
