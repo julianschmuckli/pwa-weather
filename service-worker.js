@@ -1,8 +1,6 @@
 var base_url = self.location.origin + "/pwa-weather";
 console.log(base_url);
 
-var global_self = self;
-
 var offline_files = [
     "index.html",
     "manifest.json",
@@ -65,8 +63,7 @@ self.addEventListener('fetch', function (event) {
     }
 });
 
-//TODO Not use localStorage for Service Worker. Instead use IndexDB
-/*self.addEventListener('sync', function (event) {
+self.addEventListener('sync', function (event) {
     if (event.tag == 'getWeatherData') {
         event.waitUntil(getData("Baden,Switzerland"));
     }
@@ -81,9 +78,25 @@ function getData(city) {
                 data.json().then(function (json) {
                     console.log(json);
                     if (json.cod == 200) {
-                        global_self.localStorage.setItem("weather_data", JSON.stringify(json));
-                        global_self.localStorage.setItem("last_sync_time", +new Date());
-                        console.log("Loaded new data");
+                        if ('indexedDB' in self) {
+                            var request = indexedDB.open('weather-data', 1);
+                            request.onsuccess = function () {
+                                var db = request.result;
+
+                                var tx_weather_data = db.transaction('weather-data', 'readwrite');
+                                var weather_data_location = tx_weather_data.objectStore("weather-data");
+
+                                weather_data_location.put(json, "current");
+
+                                var tx_last_used = db.transaction('last-used', 'readwrite');
+                                var last_used_location = tx_last_used.objectStore("last-used");
+
+                                var ts = {
+                                    ts: +new Date()
+                                };
+                                last_used_location.put(ts, "current");
+                            };
+                        }
                     } else {
                         console.error('An error was thrown, when trying to fetch data.');
                     }
@@ -93,6 +106,6 @@ function getData(city) {
             }
         });
     } else {
-        console.warn('No internet connection');
+        console.warn("No internet connection")
     }
-}*/
+}

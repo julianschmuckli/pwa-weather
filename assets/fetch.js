@@ -7,8 +7,19 @@ function getData(city, callback) {
                 data.json().then(function (json) {
                     console.log(json);
                     if (json.cod == 200) {
-                        localStorage.setItem("weather_data", JSON.stringify(json));
-                        localStorage.setItem("last_sync_time", +new Date());
+                        var tx_weather_data = IndexDB.transaction('weather-data', 'readwrite');
+                        var weather_data_location = tx_weather_data.objectStore("weather-data");
+
+                        weather_data_location.put(json, "current");
+
+                        var tx_last_used = IndexDB.transaction('last-used', 'readwrite');
+                        var last_used_location = tx_last_used.objectStore("last-used");
+
+                        var ts = {
+                            ts: +new Date()
+                        };
+                        last_used_location.put(ts, "current");
+
                         callback();
                     } else {
                         M.toast({html: 'An error was thrown, when trying to fetch data.'});
