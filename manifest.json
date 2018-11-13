@@ -1,6 +1,7 @@
 {
   "short_name": "Weather",
   "name": "PWA-Weather",
+  "description": "This is a weather app based on PWA.",
   "icons": [
     {
       "src": "assets/icon.png",
@@ -9,7 +10,7 @@
     }
   ],
   "start_url": "index.html",
-  "background_color": "#e05a47",
-  "theme_color": "#e05a47",
+  "background_color": "#800000",
+  "theme_color": "#800000",
   "display": "standalone"
 }

@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="assets/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="theme-color" content="#800000">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <link rel="shortcut icon" type="image/png" href="assets/icon.png"/>
+    <meta name="description" content="This is a weather app based on PWA.">
 </head>
 <body>
 <nav>
@@ -24,12 +28,15 @@
                     <span class="card-title">Baden, Switzerland</span>
                     <div class="row">
                         <div class="col s6">
-                            <span class="temperature"><span id="temperature_1">-</span> &deg;C</span>
+                            <span class="temperature"><span id="temperature">-</span> &deg;C</span>
                         </div>
                         <div class="col s6">
-
+                            <span class="other_details"><span id="humidity">-</span>%</span><br>
+                            <span class="other_details"><span id="pressure">-</span> hPa</span><br>
                         </div>
                     </div>
+                    <br>
+                    <span class="small_text">Last sync: <span id="last_time_synced"></span></span>
                 </div>
             </div>
         </div>

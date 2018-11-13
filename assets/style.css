@@ -1,3 +1,14 @@
+nav {
+    background: maroon;
+    color: white;
+}
+
 .temperature {
     font-size: 30px;
+}
+
+.small_text {
+    text-align: right;
+    color: white;
+    font-size: 12px;
 }
