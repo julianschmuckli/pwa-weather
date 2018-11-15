@@ -28,7 +28,10 @@ window.onload = function () {
     }
 };
 
+var card_add_dialog_html;
+
 function init() {
+    card_add_dialog_html = document.getElementById("add_dialog").outerHTML;
     if (navigator.onLine) {
         getData(showTemperature);
     } else {
