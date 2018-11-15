@@ -4,7 +4,7 @@ const API_KEY = "046556c9237983f3f147f37576993505";
 window.onload = function () {
     //Database initialization
     if ('indexedDB' in window) {
-        IndexDB_request = indexedDB.open('weather-data', 2);
+        IndexDB_request = indexedDB.open('weather-data', 3);
 
         IndexDB_request.onupgradeneeded = function (event) {
             var upgradeDb = IndexDB_request.result;
@@ -18,6 +18,9 @@ window.onload = function () {
             }
             if (!upgradeDb.objectStoreNames.contains('location-data')) {
                 var locationDB = upgradeDb.createObjectStore('location-data');
+            }
+            if (!upgradeDb.objectStoreNames.contains('temp-location-data')) {
+                var locationDB = upgradeDb.createObjectStore('temp-location-data');
             }
         };
 

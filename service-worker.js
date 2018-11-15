@@ -1,4 +1,5 @@
 var base_url = self.location.origin + "/pwa-weather";
+const API_KEY = "046556c9237983f3f147f37576993505";
 console.log(base_url);
 
 var offline_files = [
@@ -67,46 +68,109 @@ self.addEventListener('fetch', function (event) {
 });
 
 self.addEventListener('sync', function (event) {
+    console.log("Sync:");
+    console.log(event);
     if (event.tag == 'getWeatherData') {
         event.waitUntil(getDataInBackground());
+    } else if (event.tag == 'insertTempLocations') {
+        event.waitUntil(convertTempToLocations());
     }
 });
 
-function getData() {
+function convertTempToLocations() {
+    console.log("Started converting");
+    if ('indexedDB' in self) {
+        var request = indexedDB.open('weather-data', 3);
+        request.onsuccess = function () {
+            var IndexDB = request.result;
+            IndexDB.transaction(["temp-location-data"]).objectStore("temp-location-data").getAll().onsuccess = function (event) {
+                event.target.result.forEach(function (curr) {
+                    console.log(curr);
+
+                    //Insert new location
+                    fetch("https://api.openweathermap.org/data/2.5/weather?q=" + curr + "&appid=" + API_KEY + "&units=metric", {
+                        method: "GET"
+                    }).then(function (data) {
+                        try {
+                            data.json().then(function (json) {
+                                if (json.cod == 200) {
+                                    //Check if location is not already in IndexedDB.
+                                    IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
+                                        var is_already_registerd = false;
+                                        event.target.result.forEach(function (curr) {
+                                            if (curr == json.id) {
+                                                is_already_registerd = true;
+                                            }
+                                        });
+                                        if (!is_already_registerd) {
+                                            var tx_location_data = IndexDB.transaction('location-data', 'readwrite');
+                                            var location_data_location = tx_location_data.objectStore("location-data");
+
+                                            location_data_location.put(json.id, json.id);
+                                        } else {
+                                            console.log('This is city is already in your list.');
+                                        }
+                                    };
+                                } else if (json.cod == 429) {
+                                    console.log('API Limit exceeded.');
+                                } else {
+                                    console.log('City was not found. Try another name.');
+                                }
+                            });
+                        } catch (e) {
+                            console.log('Error while parsing JSON: ' + e);
+                        }
+                    });
+
+                    //Delete temp locations
+                    IndexDB.transaction(["temp-location-data"], "readwrite").objectStore("temp-location-data").clear();
+                });
+            };
+        }
+    }
+}
+
+function getDataInBackground() {
     if (navigator.onLine) {
         M.toast({html: 'Fetching new data'});
 
-        IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
-            event.target.result.forEach(function (id) {
-                fetch("https://api.openweathermap.org/data/2.5/weather?id=" + id + "&appid=046556c9237983f3f147f37576993505&units=metric", {
-                    method: "GET"
-                }).then(function (data) {
-                    try {
-                        data.json().then(function (json) {
-                            console.log(json);
-                            if (json.cod == 200) {
-                                var tx_weather_data = IndexDB.transaction('weather-data', 'readwrite');
-                                var weather_data_location = tx_weather_data.objectStore("weather-data");
+        if ('indexedDB' in self) {
+            var request = indexedDB.open('weather-data', 3);
+            request.onsuccess = function () {
+                var IndexDB = request.result;
+                IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
+                    event.target.result.forEach(function (id) {
+                        fetch("https://api.openweathermap.org/data/2.5/weather?id=" + id + "&appid=" + API_KEY + "&units=metric", {
+                            method: "GET"
+                        }).then(function (data) {
+                            try {
+                                data.json().then(function (json) {
+                                    console.log(json);
+                                    if (json.cod == 200) {
+                                        var tx_weather_data = IndexDB.transaction('weather-data', 'readwrite');
+                                        var weather_data_location = tx_weather_data.objectStore("weather-data");
 
-                                weather_data_location.put(json, json.id);
+                                        weather_data_location.put(json, json.id);
 
-                                var tx_last_used = IndexDB.transaction('last-used', 'readwrite');
-                                var last_used_location = tx_last_used.objectStore("last-used");
+                                        var tx_last_used = IndexDB.transaction('last-used', 'readwrite');
+                                        var last_used_location = tx_last_used.objectStore("last-used");
 
-                                var ts = {
-                                    ts: +new Date()
-                                };
-                                last_used_location.put(ts, "current");
-                            } else {
-                                console.log('An error was thrown, when trying to fetch data.');
+                                        var ts = {
+                                            ts: +new Date()
+                                        };
+                                        last_used_location.put(ts, "current");
+                                    } else {
+                                        console.log('An error was thrown, when trying to fetch data.');
+                                    }
+                                });
+                            } catch (e) {
+                                console.log('Error while parsing JSON: ' + e);
                             }
                         });
-                    } catch (e) {
-                        console.log('Error while parsing JSON: ' + e);
-                    }
-                });
-            });
-        };
+                    });
+                };
+            };
+        }
     } else {
         console.log('No internet connection');
     }
