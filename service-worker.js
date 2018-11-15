@@ -10,6 +10,8 @@ var offline_files = [
     "assets/style.css",
     "assets/icon.png",
     "assets/init.js",
+    "assets/controller.js",
+    "assets/lib.js",
     "assets/insert.js",
     "assets/fetch.js"
 ];
@@ -64,47 +66,46 @@ self.addEventListener('fetch', function (event) {
 
 self.addEventListener('sync', function (event) {
     if (event.tag == 'getWeatherData') {
-        event.waitUntil(getData("Baden,Switzerland"));
+        event.waitUntil(getDataInBackground());
     }
 });
 
-function getData(city) {
+function getData() {
     if (navigator.onLine) {
-        fetch("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=046556c9237983f3f147f37576993505&units=metric", {
-            method: "GET"
-        }).then(function (data) {
-            try {
-                data.json().then(function (json) {
-                    console.log(json);
-                    if (json.cod == 200) {
-                        if ('indexedDB' in self) {
-                            var request = indexedDB.open('weather-data', 1);
-                            request.onsuccess = function () {
-                                var db = request.result;
+        M.toast({html: 'Fetching new data'});
 
-                                var tx_weather_data = db.transaction('weather-data', 'readwrite');
+        IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
+            event.target.result.forEach(function (id) {
+                fetch("https://api.openweathermap.org/data/2.5/weather?id=" + id + "&appid=046556c9237983f3f147f37576993505&units=metric", {
+                    method: "GET"
+                }).then(function (data) {
+                    try {
+                        data.json().then(function (json) {
+                            console.log(json);
+                            if (json.cod == 200) {
+                                var tx_weather_data = IndexDB.transaction('weather-data', 'readwrite');
                                 var weather_data_location = tx_weather_data.objectStore("weather-data");
 
-                                weather_data_location.put(json, "current");
+                                weather_data_location.put(json, json.id);
 
-                                var tx_last_used = db.transaction('last-used', 'readwrite');
+                                var tx_last_used = IndexDB.transaction('last-used', 'readwrite');
                                 var last_used_location = tx_last_used.objectStore("last-used");
 
                                 var ts = {
                                     ts: +new Date()
                                 };
                                 last_used_location.put(ts, "current");
-                            };
-                        }
-                    } else {
-                        console.error('An error was thrown, when trying to fetch data.');
+                            } else {
+                                console.log('An error was thrown, when trying to fetch data.');
+                            }
+                        });
+                    } catch (e) {
+                        console.log('Error while parsing JSON: ' + e);
                     }
                 });
-            } catch (e) {
-                console.error('Error while parsing JSON: ' + e);
-            }
-        });
+            });
+        };
     } else {
-        console.warn("No internet connection")
+        console.log('No internet connection');
     }
 }

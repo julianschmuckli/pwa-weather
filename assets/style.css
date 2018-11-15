@@ -9,6 +9,25 @@ nav {
 
 .small_text {
     text-align: right;
-    color: white;
+    color: #333333;
     font-size: 12px;
+}
+
+.card-title {
+    font-weight: bolder !important;
+}
+
+.btn, .btn:focus, .btn:hover {
+    background: #390000;
+}
+
+/* label focus color */
+.input-field input[type=text]:focus + label {
+    color: #390000 !important;
+}
+
+/* label underline focus color */
+.input-field input[type=text]:focus {
+    border-bottom: 1px solid #390000 !important;
+    box-shadow: 0 1px 0 0 #390000 !important;
 }

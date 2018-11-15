@@ -1,8 +1,10 @@
 var IndexDB_request = undefined, IndexDB = undefined;
+
+const API_KEY = "046556c9237983f3f147f37576993505";
 window.onload = function () {
     //Database initialization
     if ('indexedDB' in window) {
-        IndexDB_request = indexedDB.open('weather-data', 1);
+        IndexDB_request = indexedDB.open('weather-data', 2);
 
         IndexDB_request.onupgradeneeded = function (event) {
             var upgradeDb = IndexDB_request.result;
@@ -13,6 +15,9 @@ window.onload = function () {
             if (!upgradeDb.objectStoreNames.contains('last-used')) {
                 var lastUsedDB = upgradeDb.createObjectStore('last-used');
                 //lastUsedDB.createIndex("ts", "ts", {unique: true});
+            }
+            if (!upgradeDb.objectStoreNames.contains('location-data')) {
+                var locationDB = upgradeDb.createObjectStore('location-data');
             }
         };
 
@@ -25,7 +30,7 @@ window.onload = function () {
 
 function init() {
     if (navigator.onLine) {
-        getData("Baden,Switzerland", showTemperature);
+        getData(showTemperature);
     } else {
         showTemperature();
         M.toast({html: 'You are offline. Loading old data.'});
@@ -50,5 +55,6 @@ function changeNetworkListener() {
         current_notification_network_listener = M.toast({html: 'You are offline now.'});
     } else {
         current_notification_network_listener = M.toast({html: 'Welcome back online.'});
+        getData(showTemperature);
     }
 }
