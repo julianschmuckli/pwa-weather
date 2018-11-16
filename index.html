@@ -40,8 +40,13 @@
         </div>
     </div>
     <div style="width: 100%;text-align: center;margin-bottom: 20px;">
-        <span class='small_text' id="offline_locations_wrapper"><span id='offline_locations'></span> Location(s) created when you were offline.<br></span>
+        <span class='small_text' id="offline_locations_wrapper"><span id='offline_locations'></span> Location(s) created when you were offline.</span>
+        <br>
         <span class='small_text'>Last sync: <span id='last_time_synced'>Never</span></span>
+        <br><br>
+        <span onclick="activateNotification()" style="cursor: pointer;">
+            <i class="material-icons" title="Activate notifications">add_alert</i>
+        </span>
     </div>
 </main>
 <script src="assets/lib/materialize.min.js" defer></script>

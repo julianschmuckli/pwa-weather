@@ -60,6 +60,18 @@ function addLocation() {
     return false;
 }
 
+function activateNotification() {
+    Notification.requestPermission(function (status) {
+        if (status == "granted") {
+            M.toast({html: "Notifications has been enabled."});
+        } else if (status == "default") {
+            M.toast({html: "The notification permission request has been dismissed"});
+        } else if (status == "denied") {
+            M.toast({html: "Notifications has been turned off."});
+        }
+    });
+}
+
 function deleteCity(id) {
     IndexDB.transaction(["location-data"], 'readwrite').objectStore("location-data").delete(id).onsuccess = function (event) {
         IndexDB.transaction(["weather-data"], 'readwrite').objectStore("weather-data").delete(id).onsuccess = function (event) {

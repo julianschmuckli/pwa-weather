@@ -126,6 +126,19 @@ function convertTempToLocations() {
                     //Delete temp locations
                     IndexDB.transaction(["temp-location-data"], "readwrite").objectStore("temp-location-data").clear();
                 });
+
+                var options = {
+                    body: 'The cities has been added to your list.',
+                    icon: 'assets/icon.png',
+                    vibrate: [100, 50, 100],
+                    data: {
+                        dateOfArrival: Date.now(),
+                        primaryKey: 1
+                    }
+                };
+                console.log("Here");
+                console.log(ServiceWorkerRegistration);
+                self.registration.showNotification('Cities added', options);
             };
         }
     }
