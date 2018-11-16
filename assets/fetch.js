@@ -1,5 +1,6 @@
 function getData(callback) {
     if (navigator.onLine) {
+
         IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
             event.target.result.forEach(function (id) {
                 fetch("https://api.openweathermap.org/data/2.5/weather?id=" + id + "&appid=" + API_KEY + "&units=metric", {

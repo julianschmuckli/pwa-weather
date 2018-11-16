@@ -16,6 +16,7 @@ var offline_files = [
     "assets/init.js",
     "assets/controller.js",
     "assets/lib.js",
+    "assets/polyfill.js",
     "assets/insert.js",
     "assets/fetch.js"
 ];
