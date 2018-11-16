@@ -42,14 +42,28 @@ function showTemperature() {
                 clearContainer();
             }
         };
+    } catch (e) {
+        M.toast({html: "There was an error: " + e})
+    }
 
-        IndexDB.transaction(["last-used"]).objectStore("last-used").get("current").onsuccess = function (event) {
+    showLastSync();
+}
+
+function showOfflineLocations() {
+    IndexDB.transaction(["temp-location-data"]).objectStore("temp-location-data").count().onsuccess = function (event) {
+        document.getElementById("offline_locations").innerText = event.target.result;
+        document.getElementById("offline_locations_wrapper").style.display = "inline-block";
+    }
+}
+
+function showLastSync() {
+    IndexDB.transaction(["last-used"]).objectStore("last-used").get("current").onsuccess = function (event) {
+        try {
             var date = new Date(event.target.result.ts);
             document.getElementById("last_time_synced").innerText = (date.getDate() + "").padStart(2, "0") + "." + ((date.getMonth() + 1) + "").padStart(2, "0") + "." + date.getFullYear() + " " + (date.getHours() + "").padStart(2, "0") + ":" + (date.getMinutes() + "").padStart(2, "0") + ":" + (date.getSeconds() + "").padStart(2, "0");
+        } catch (e) {
+            //Never synced
         }
-    } catch (e) {
-        console.error(e);
-        getData(showTemperature);
     }
 }
 

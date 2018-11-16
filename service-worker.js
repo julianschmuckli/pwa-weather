@@ -12,6 +12,7 @@ var offline_files = [
     "assets/font/MaterialIcons-Regular.tff",
     "assets/style.css",
     "assets/icon.png",
+    "assets/icon_512.png",
     "assets/init.js",
     "assets/controller.js",
     "assets/lib.js",

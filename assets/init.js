@@ -39,11 +39,13 @@ function init() {
         getData(showTemperature);
     } else {
         showTemperature();
+        showOfflineLocations();
         M.toast({html: 'You are offline. Loading old data.'});
         navigator.serviceWorker.ready.then(function (swRegistration) {
             return swRegistration.sync.register('getWeatherData');
         });
     }
+    showLastSync();
 }
 
 window.addEventListener("online", changeNetworkListener);

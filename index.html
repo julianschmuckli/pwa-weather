@@ -23,12 +23,13 @@
     <div class="row" id="card_container">
         <!-- Will be filled -->
         <div class="col s12 m6" id="add_dialog">
-            <div class="card darken-1" style="background-color: #DDDDDD;text-align: center;">
+            <div class="card darken-1" style="background-color: #f9f9f9;text-align: center;">
                 <div class="card-content black-text">
                     <form onsubmit="return addLocation();">
                         <div class="input-field">
-                            <input id="new_location" type="text" class="validate">
-                            <label for="new_location">New location</label>
+                            <input id="new_location" type="text" class="validate"
+                                   style="border-bottom: 1px solid black;">
+                            <label for="new_location" style="color:black;">New location</label>
                         </div>
                         <button type="submit" class="waves-effect waves-light btn">
                             <i class="material-icons">add</i>
@@ -39,6 +40,7 @@
         </div>
     </div>
     <div style="width: 100%;text-align: center;margin-bottom: 20px;">
+        <span class='small_text' id="offline_locations_wrapper"><span id='offline_locations'></span> Location(s) created when you were offline.<br></span>
         <span class='small_text'>Last sync: <span id='last_time_synced'>Never</span></span>
     </div>
 </main>

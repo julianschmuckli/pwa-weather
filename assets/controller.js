@@ -1,54 +1,60 @@
 function addLocation() {
     var location = document.getElementById("new_location").value;
 
-    if (navigator.onLine) {
-        fetch("https://api.openweathermap.org/data/2.5/weather?q=" + location + "&appid=" + API_KEY + "&units=metric", {
-            method: "GET"
-        }).then(function (data) {
-            try {
-                data.json().then(function (json) {
-                    if (json.cod == 200) {
-                        //Check if location is not already in IndexedDB.
-                        IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
-                            var is_already_registerd = false;
-                            event.target.result.forEach(function (curr) {
-                                if (curr == json.id) {
-                                    is_already_registerd = true;
-                                }
-                            });
-                            if (!is_already_registerd) {
-                                var tx_location_data = IndexDB.transaction('location-data', 'readwrite');
-                                var location_data_location = tx_location_data.objectStore("location-data");
+    if (location == "") {
 
-                                location_data_location.put(json.id, json.id);
-                                getData(showTemperature);
-                            } else {
-                                M.toast({html: 'This is city is already in your list.'});
-                            }
-                        };
-                    } else if (json.cod == 429) {
-                        M.toast({html: 'API Limit exceeded.'});
-                    } else {
-                        M.toast({html: 'City was not found. Try another name.'});
-                    }
-                });
-            } catch (e) {
-                M.toast({html: 'Error while parsing JSON: ' + e});
-            }
-        });
     } else {
-        var tx_location_data = IndexDB.transaction('temp-location-data', 'readwrite');
-        var location_data_location = tx_location_data.objectStore("temp-location-data");
+        if (navigator.onLine) {
+            fetch("https://api.openweathermap.org/data/2.5/weather?q=" + location + "&appid=" + API_KEY + "&units=metric", {
+                method: "GET"
+            }).then(function (data) {
+                try {
+                    data.json().then(function (json) {
+                        if (json.cod == 200) {
+                            //Check if location is not already in IndexedDB.
+                            IndexDB.transaction(["location-data"]).objectStore("location-data").getAll().onsuccess = function (event) {
+                                var is_already_registerd = false;
+                                event.target.result.forEach(function (curr) {
+                                    if (curr == json.id) {
+                                        is_already_registerd = true;
+                                    }
+                                });
+                                if (!is_already_registerd) {
+                                    var tx_location_data = IndexDB.transaction('location-data', 'readwrite');
+                                    var location_data_location = tx_location_data.objectStore("location-data");
 
-        location_data_location.add(location, guid());
+                                    location_data_location.put(json.id, json.id);
+                                    getData(showTemperature);
+                                } else {
+                                    M.toast({html: 'This is city is already in your list.'});
+                                }
+                            };
+                        } else if (json.cod == 429) {
+                            M.toast({html: 'API Limit exceeded.'});
+                        } else {
+                            M.toast({html: 'City was not found. Try another name.'});
+                        }
+                    });
+                } catch (e) {
+                    M.toast({html: 'Error while parsing JSON: ' + e});
+                }
+            });
+        } else {
+            var tx_location_data = IndexDB.transaction('temp-location-data', 'readwrite');
+            var location_data_location = tx_location_data.objectStore("temp-location-data");
 
-        document.getElementById("new_location").value = "";
+            location_data_location.add(location, guid());
 
-        navigator.serviceWorker.ready.then(function (swRegistration) {
-            return swRegistration.sync.register('insertTempLocations');
-        });
+            document.getElementById("new_location").value = "";
 
-        M.toast({html: "Your location will be added as soon as you will be back online."})
+            navigator.serviceWorker.ready.then(function (swRegistration) {
+                return swRegistration.sync.register('insertTempLocations');
+            });
+
+            M.toast({html: "Your location will be added as soon as you will be back online."});
+
+            showOfflineLocations();
+        }
     }
 
     return false;
